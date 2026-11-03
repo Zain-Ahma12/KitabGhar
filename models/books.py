@@ -4,9 +4,12 @@ from uuid import UUID
 
 from pydantic import model_validator
 from sqlmodel import Field, Relationship, Session, SQLModel
+from datetime import date, datetime, timezone
+from typing import Optional
 
-
-
+def utc_now() -> datetime:
+    """Return the current UTC datetime."""
+    return datetime.now(timezone.utc)
 
 
 class BookCondition(str, Enum):
@@ -41,7 +44,7 @@ class Book(SQLModel, table=True):
     # Foreign key referencing users.id.
     borrower_id: UUID | None = Field(
         default=None,
-        foreign_key="users.id",
+        foreign_key="user.id",
         index=True,
     )
 
@@ -50,7 +53,7 @@ class Book(SQLModel, table=True):
     borrow_end_date: date | None = None
 
     # Many books can belong to the same borrower.
-    borrower: User | None = Relationship(
+    borrower: Optional["User"] = Relationship(
         back_populates="books"
     )
 
